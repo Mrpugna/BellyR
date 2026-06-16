@@ -11,6 +11,7 @@ const state = {
   editingPetId: null,
   deletingPetId: null,
   editingBookingId: null,
+  deletingBookingId: null,
 };
 
 const services = [
@@ -151,6 +152,17 @@ function bookingClass(status) {
   return 'confirmed';
 }
 
+function bookingCoversDate(booking, date) {
+  return booking.check_in <= date && booking.check_out >= date;
+}
+
+function bookingDateLabel(booking, date) {
+  if (booking.check_in === date && booking.check_out === date) return 'Same day';
+  if (booking.check_in === date) return 'Check-in';
+  if (booking.check_out === date) return 'Check-out';
+  return 'Stay';
+}
+
 function renderCalendar() {
   const year = state.calendarDate.getFullYear();
   const month = state.calendarDate.getMonth();
@@ -165,14 +177,14 @@ function renderCalendar() {
     const muted = dayNumber < 1 || dayNumber > daysInMonth;
     const displayDay = dayNumber < 1 ? previousDays + dayNumber : dayNumber > daysInMonth ? dayNumber - daysInMonth : dayNumber;
     const cellDate = muted ? '' : `${year}-${String(month + 1).padStart(2,'0')}-${String(dayNumber).padStart(2,'0')}`;
-    const dayBookings = state.bookings.filter(item => item.check_in === cellDate);
-    cells.push(`<div class="calendar-day ${muted?'muted':''} ${cellDate===TODAY?'today':''}"><span class="date-num">${displayDay}</span>${dayBookings.slice(0,2).map(item => `<button class="booking-chip ${bookingClass(item.status)} edit-booking-chip" data-id="${item.id}" type="button" aria-label="Edit ${escapeHtml(item.pet_name)} booking">${escapeHtml(item.pet_name)} · ${escapeHtml(item.service_type)}</button>`).join('')}${dayBookings.length>2?`<span class="more-bookings">+${dayBookings.length-2} more</span>`:''}</div>`);
+    const dayBookings = state.bookings.filter(item => cellDate && bookingCoversDate(item, cellDate));
+    cells.push(`<div class="calendar-day ${muted?'muted':''} ${cellDate===TODAY?'today':''}"><span class="date-num">${displayDay}</span>${dayBookings.slice(0,2).map(item => `<button class="booking-chip ${bookingClass(item.status)} edit-booking-chip" data-id="${item.id}" type="button" aria-label="Edit ${escapeHtml(item.pet_name)} booking">${escapeHtml(item.pet_name)} · ${escapeHtml(bookingDateLabel(item, cellDate))}</button>`).join('')}${dayBookings.length>2?`<span class="more-bookings">+${dayBookings.length-2} more</span>`:''}</div>`);
   }
   document.querySelector('#calendar-grid').innerHTML = cells.join('');
   const todayBookings = state.bookings.filter(item => item.check_in === TODAY || item.check_out === TODAY);
   document.querySelector('#schedule-arrivals').textContent = state.bookings.filter(item => item.check_in === TODAY && item.status !== 'Cancelled').length;
   document.querySelector('#schedule-departures').textContent = state.bookings.filter(item => item.check_out === TODAY && item.status !== 'Cancelled').length;
-  document.querySelector('#schedule-list').innerHTML = todayBookings.length ? todayBookings.map(item => `<div class="schedule-item"><div class="schedule-time">${item.check_in===TODAY?'IN':'OUT'}</div><div><strong>${escapeHtml(item.pet_name)}</strong><p>${escapeHtml(item.service_type)} · ${escapeHtml(item.check_in)} to ${escapeHtml(item.check_out)}</p><span class="status-pill ${bookingClass(item.status)}">${escapeHtml(item.status)}</span><button class="row-action edit-booking" data-id="${item.id}" type="button">Edit</button></div></div>`).join('') : '<div class="empty-state">No bookings for today.</div>';
+  document.querySelector('#schedule-list').innerHTML = todayBookings.length ? todayBookings.map(item => `<div class="schedule-item"><div class="schedule-time">${item.check_in===TODAY?'IN':'OUT'}</div><div><strong>${escapeHtml(item.pet_name)}</strong><p>${escapeHtml(item.service_type)} · ${escapeHtml(item.check_in)} to ${escapeHtml(item.check_out)}</p><span class="status-pill ${bookingClass(item.status)}">${escapeHtml(item.status)}</span><div class="booking-actions"><button class="row-action edit-booking" data-id="${item.id}" type="button">Edit</button><button class="row-action delete delete-booking" data-id="${item.id}" type="button">Delete</button></div></div></div>`).join('') : '<div class="empty-state">No bookings for today.</div>';
 }
 
 function carePetData() {
@@ -324,6 +336,20 @@ function openEditBooking(bookingId) {
   workflowModal.classList.add('open');
 }
 
+
+function openDeleteBooking(bookingId) {
+  const booking = state.bookings.find((item) => item.id === bookingId);
+  if (!booking) return;
+  state.deletingBookingId = bookingId;
+  document.querySelector('#workflow-eyebrow').textContent = 'Booking calendar';
+  document.querySelector('#workflow-title').textContent = `Delete ${booking.pet_name} booking?`;
+  document.querySelector('#workflow-description').textContent = `${booking.check_in} to ${booking.check_out} · ${booking.service_type} · ${booking.status}`;
+  const form = document.querySelector('#workflow-form');
+  form.dataset.type = 'delete-booking';
+  form.innerHTML = `<p class="delete-warning">This removes the booking from the calendar. Pet profile and financial records will not be deleted.</p><div class="modal-actions"><button class="ghost-button workflow-cancel" type="button">Cancel</button><button class="danger-button" type="submit">Delete booking</button></div>`;
+  workflowModal.classList.add('open');
+}
+
 function openWorkflow(type) {
   const form = document.querySelector('#workflow-form');
   const petOptions = state.pets.map(p => `<option>${escapeHtml(p.name)}</option>`).join('');
@@ -393,7 +419,17 @@ document.querySelector('#workflow-form').addEventListener('submit', async e => {
   e.preventDefault();
   const data=Object.fromEntries(new FormData(e.target));
   try {
-    if(e.target.dataset.type==='booking' || e.target.dataset.type==='edit-booking') {
+    if(e.target.dataset.type==='delete-booking') {
+    const booking=state.bookings.find(item=>item.id===state.deletingBookingId);
+    try {
+      await api(`/api/bookings/${state.deletingBookingId}`,{method:'DELETE'});
+      state.bookings=state.bookings.filter(item=>item.id!==state.deletingBookingId);
+      renderCalendar();
+      renderStats();
+      closeModal(workflowModal);
+      showToast(`${booking?.pet_name || 'Booking'} booking deleted`);
+    } catch(error) { showToast(error.message); }
+  } else if(e.target.dataset.type==='booking' || e.target.dataset.type==='edit-booking') {
       const editing=e.target.dataset.type==='edit-booking';
       const saved=await api(editing?`/api/bookings/${state.editingBookingId}`:'/api/bookings',{method:editing?'PUT':'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
       if(editing){const index=state.bookings.findIndex(item=>item.id===state.editingBookingId);state.bookings[index]=saved;}else{state.bookings.push(saved);}
@@ -486,12 +522,17 @@ document.querySelector('#care-pets').addEventListener('click',e=>{
 
 
 document.querySelector('#schedule-list').addEventListener('click',e=>{
-  const button=e.target.closest('.edit-booking');
-  if(button) openEditBooking(Number(button.dataset.id));
+  const edit=e.target.closest('.edit-booking');
+  const remove=e.target.closest('.delete-booking');
+  if(edit) openEditBooking(Number(edit.dataset.id));
+  if(remove) openDeleteBooking(Number(remove.dataset.id));
 });
 document.querySelector('#calendar-grid').addEventListener('click',e=>{
   const button=e.target.closest('.edit-booking-chip');
   if(button) openEditBooking(Number(button.dataset.id));
+});
+document.querySelector('#workflow-form').addEventListener('click',e=>{
+  if(e.target.closest('.workflow-cancel')) closeModal(workflowModal);
 });
 
 document.querySelector('.month-prev').addEventListener('click',()=>{state.calendarDate.setMonth(state.calendarDate.getMonth()-1);renderCalendar();});

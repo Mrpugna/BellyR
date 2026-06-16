@@ -333,6 +333,17 @@ class BellyRubHandler(SimpleHTTPRequestHandler):
 
     def do_DELETE(self):
         path = urlparse(self.path).path
+        if path.startswith("/api/bookings/"):
+            try:
+                booking_id = int(path.rsplit("/", 1)[1])
+            except ValueError:
+                return self.send_json({"error": "Invalid booking id"}, 400)
+            with connect() as db:
+                booking = db.execute("SELECT * FROM bookings WHERE id = ?", (booking_id,)).fetchone()
+                if not booking:
+                    return self.send_json({"error": "Booking not found"}, 404)
+                db.execute("DELETE FROM bookings WHERE id = ?", (booking_id,))
+            return self.send_json({"deleted": True, "id": booking_id, "pet_name": booking["pet_name"]})
         if not path.startswith("/api/pets/"):
             return self.send_json({"error": "Endpoint not found"}, 404)
         try:

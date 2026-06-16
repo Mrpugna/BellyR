@@ -159,6 +159,15 @@ export default async (req) => {
     return json(data.bookings[index]);
   }
 
+  if (bookingMatch && method === 'DELETE') {
+    const id = Number(bookingMatch[1]);
+    const index = data.bookings.findIndex((booking) => booking.id === id);
+    if (index === -1) return json({ error: 'Booking not found' }, 404);
+    const [deleted] = data.bookings.splice(index, 1);
+    await saveData(data);
+    return json({ deleted: true, id, pet_name: deleted.pet_name });
+  }
+
   if (method === 'POST' && path === '/api/care-logs') {
     const body = await readBody(req);
     const missing = missingFields(body, ['pet_name', 'meal_status', 'mood', 'channel']);
