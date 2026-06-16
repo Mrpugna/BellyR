@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BellyRub Pet Staycation</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <svg class="svg-sprite" aria-hidden="true">
+    <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 10h18"/></symbol>
+    <symbol id="i-heart" viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8z"/></symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></symbol>
+    <symbol id="i-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.2h-4V21a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9A1.7 1.7 0 0 0 3 14H2.8v-4H3a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1a1.7 1.7 0 0 0 1.9.3A1.7 1.7 0 0 0 10 3V2.8h4V3a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.2v4H21a1.7 1.7 0 0 0-1.6 1z"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-bell" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></symbol>
+    <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="i-message" viewBox="0 0 24 24"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/></symbol>
+    <symbol id="i-wallet" viewBox="0 0 24 24"><path d="M3 6a3 3 0 0 1 3-3h13v4H6a3 3 0 0 0 0 6h15v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><circle cx="17" cy="10" r="1"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0 1 14 0M17 11a4 4 0 0 1 5 4v6"/></symbol>
+    <symbol id="i-send" viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4zM22 2 11 13"/></symbol>
+    <symbol id="i-more" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
+  </svg>
+
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand"><div class="brand-mark" id="brand-mark">B</div><div><strong id="brand-name">BellyRub</strong><span id="brand-subtitle">Pet Staycation</span></div></div>
+      <nav class="nav-list" aria-label="Main navigation">
+        <button class="nav-item active" data-page="dashboard"><svg><use href="#i-grid"/></svg><span>Pet dashboard</span></button>
+        <button class="nav-item" data-page="calendar"><svg><use href="#i-calendar"/></svg><span>Bookings</span><b id="nav-booking-count">0</b></button>
+        <button class="nav-item" data-page="care"><svg><use href="#i-heart"/></svg><span>Daily care</span><b id="nav-care-count">0</b></button>
+        <button class="nav-item" data-page="finance"><svg><use href="#i-chart"/></svg><span>Financials</span></button>
+      </nav>
+      <div class="sidebar-spacer"></div>
+      <div class="capacity-card">
+        <div class="capacity-art"><span></span><span></span><span></span></div>
+        <p>Today is looking busy!</p>
+        <strong id="capacity-label">0 of 18 spots filled</strong>
+        <div class="progress"><i id="capacity-progress" style="width:0%"></i></div>
+      </div>
+      <button class="nav-item" id="settings-button"><svg><use href="#i-settings"/></svg><span>Settings</span></button>
+      <div class="profile"><div class="avatar avatar-staff" id="manager-avatar">MK</div><div><strong id="manager-name">May Kanya</strong><span id="manager-role">Staycation manager</span></div><svg><use href="#i-more"/></svg></div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <button class="mobile-menu" aria-label="Open menu"><span></span><span></span><span></span></button>
+        <div class="page-title"><span class="eyebrow" id="page-eyebrow">Monday, 15 June</span><h1 id="page-title">Good morning, May</h1></div>
+        <div class="top-actions"><label class="global-search"><svg><use href="#i-search"/></svg><input type="search" placeholder="Search pets, owners..."></label><button class="icon-button"><svg><use href="#i-bell"/></svg><i></i></button><button class="primary-button" id="primary-action"><svg><use href="#i-plus"/></svg><span>Add new pet</span></button></div>
+      </header>
+
+      <section class="page active" id="dashboard-page">
+        <div class="stats-grid">
+          <article class="stat-card peach"><div class="stat-icon"><svg><use href="#i-heart"/></svg></div><div><span>Pets in our care</span><strong id="stat-care">0</strong><small><b id="stat-arriving-note">0</b> arriving today</small></div></article>
+          <article class="stat-card mint"><div class="stat-icon"><svg><use href="#i-clock"/></svg></div><div><span>Checking in today</span><strong id="stat-arriving">0</strong><small>Confirmed arrivals</small></div></article>
+          <article class="stat-card lavender"><div class="stat-icon"><svg><use href="#i-calendar"/></svg></div><div><span>Checking out today</span><strong id="stat-checkout">0</strong><small>Ready for pickup</small></div></article>
+          <article class="stat-card yellow"><div class="stat-icon"><svg><use href="#i-message"/></svg></div><div><span>Care updates due</span><strong id="stat-care-due">0</strong><small><b>Send before 5 PM</b></small></div></article>
+        </div>
+
+        <div class="section-heading"><div><h2>Pets staying with us</h2><p>A quick look at every guest and what they need today.</p></div><div class="view-controls"><label class="mini-search"><svg><use href="#i-search"/></svg><input id="pet-search" type="search" placeholder="Search pets"></label><select id="pet-filter"><option value="all">All statuses</option><option value="Checked in">Checked in</option><option value="Arriving today">Arriving today</option><option value="Checking out">Checking out</option></select></div></div>
+
+        <div class="pet-table-card">
+          <div class="table-head"><span>Pet</span><span>Stay details</span><span>Owner</span><span>Temperament</span><span>Status</span><span>Actions</span></div>
+          <div id="pet-list"></div>
+        </div>
+      </section>
+
+      <section class="page" id="calendar-page">
+        <div class="calendar-toolbar"><div class="month-nav"><button class="icon-button month-prev" aria-label="Previous month">&#8249;</button><h2 id="calendar-month">June 2026</h2><button class="icon-button month-next" aria-label="Next month">&#8250;</button><button class="ghost-button" id="calendar-today">Today</button></div><div class="booking-legend"><span><i class="dot confirmed"></i>Confirmed</span><span><i class="dot pending"></i>Pending</span><span><i class="dot checked"></i>Checked in</span></div></div>
+        <div class="calendar-layout">
+          <article class="calendar-card"><div class="weekdays"><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span></div><div class="calendar-grid" id="calendar-grid"></div></article>
+          <aside class="day-panel"><span class="eyebrow">Monday, 15 June</span><h2>Today's schedule</h2><div class="schedule-summary"><div><strong id="schedule-arrivals">0</strong><span>Arrivals</span></div><div><strong id="schedule-departures">0</strong><span>Departures</span></div></div><div id="schedule-list"></div></aside>
+        </div>
+      </section>
+
+      <section class="page" id="care-page">
+        <div class="care-layout">
+          <div class="care-list-panel"><div class="section-heading compact"><div><h2>Daily care updates</h2><p>Monday, 15 June</p></div><span class="count-pill" id="care-due-count">0 due</span></div><div id="care-pets"></div></div>
+          <article class="care-form-card">
+            <div class="care-form-header"><div class="avatar avatar-coco">CO</div><div><span class="eyebrow">Care update for</span><h2 id="care-pet-name">Coco</h2><p id="care-owner">For Ploy via LINE</p></div><span class="connected-pill"><i></i>Channel ready</span></div>
+            <div class="care-fields"><div class="care-field"><label>Meals</label><div class="segmented" data-field="meal"><button>None</button><button>Some</button><button class="selected">All eaten</button></div></div><div class="care-field"><label>Energy & mood</label><div class="mood-options"><button data-mood="Sleepy"><span>&#9789;</span>Sleepy</button><button data-mood="Calm"><span>&#9728;</span>Calm</button><button class="selected" data-mood="Happy"><span>&#9825;</span>Happy</button><button data-mood="Playful"><span>&#10022;</span>Playful</button></div></div><div class="care-field"><label>Activities & toilet</label><div class="check-grid"><label><input type="checkbox" checked><span>Morning walk</span></label><label><input type="checkbox" checked><span>Playtime</span></label><label><input type="checkbox" checked><span>Pee</span></label><label><input type="checkbox"><span>Poo</span></label><label><input type="checkbox" checked><span>Nap</span></label></div></div><div class="care-field"><label for="care-note">A little note for the owner</label><textarea id="care-note" rows="4">Coco had a wonderful morning! She finished breakfast, made a new friend, and loved her garden walk. She's now having a cozy afternoon nap.</textarea></div><div class="photo-upload"><div class="upload-preview"><span>CO</span></div><div><strong>Add today's photos</strong><p id="photo-status">Up to 6 photos</p></div><input id="care-photos" type="file" accept="image/*" multiple hidden><button class="ghost-button" id="choose-photos" type="button">Choose photos</button></div></div>
+            <div class="message-preview"><div class="line-logo">LINE</div><div><span>Message preview</span><p id="preview-copy">Coco had a wonderful morning! She finished breakfast, made a new friend, and loved her garden walk. She's now having a cozy afternoon nap.</p></div></div>
+            <button class="send-button" id="send-update"><svg><use href="#i-send"/></svg>Save owner update</button>
+          </article>
+        </div>
+      </section>
+
+      <section class="page" id="finance-page">
+        <div class="finance-top"><div><span class="eyebrow">Recorded performance</span><h2>Financial overview</h2><p>Revenue and booking health at a glance.</p></div><select disabled><option>All records</option></select></div>
+        <div class="finance-stats"><article class="metric-card featured"><span>Recorded revenue</span><strong id="finance-revenue">&#3647;0</strong><small><b>Live</b> from payments</small><div class="spark-bars"><i style="height:35%"></i><i style="height:52%"></i><i style="height:43%"></i><i style="height:68%"></i><i style="height:61%"></i><i style="height:87%"></i><i style="height:100%"></i></div></article><article class="metric-card"><div class="metric-icon coral"><svg><use href="#i-users"/></svg></div><span>Occupancy rate</span><strong id="finance-occupancy">0%</strong><small id="finance-occupancy-note">0 of 18 spots today</small></article><article class="metric-card"><div class="metric-icon green"><svg><use href="#i-check"/></svg></div><span>Paid bookings</span><strong id="finance-paid-count">0</strong><small id="finance-paid-total">&#3647;0 collected</small></article><article class="metric-card"><div class="metric-icon gold"><svg><use href="#i-clock"/></svg></div><span>Pending payment</span><strong id="finance-pending-count">0</strong><small id="finance-pending-total">&#3647;0 outstanding</small></article></div>
+        <div class="finance-grid"><article class="chart-card"><div class="card-title"><div><h3>Revenue trend</h3><p>Last 6 months</p></div><span class="trend-badge">+24.5%</span></div><div class="bar-chart" id="revenue-chart"></div></article><article class="service-card"><div class="card-title"><div><h3>Service performance</h3><p>Revenue by menu item</p></div><button class="text-button">View all</button></div><div id="service-list"></div></article></div>
+        <article class="payments-card"><div class="card-title"><div><h3>Recent payments</h3><p>Latest customer transactions</p></div><button class="ghost-button" id="export-report">Export report</button></div><div class="payment-table" id="payment-list"></div></article>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal-backdrop" id="modal-backdrop">
+    <div class="modal"><button class="modal-close" aria-label="Close">&times;</button><span class="eyebrow">New guest</span><h2>Add a pet profile</h2><p>Keep the essentials together so every team member knows how to care for them.</p><form id="pet-form"><div class="form-row"><label>Pet name<input name="name" required placeholder="e.g. Miso"></label><label>Breed<input name="breed" required placeholder="e.g. Shiba Inu"></label></div><div class="form-row"><label>Age<input name="age" placeholder="e.g. 3 years"></label><label>Sex<select name="sex"><option>Female</option><option>Male</option></select></label></div><div class="form-row"><label>Food per meal (grams)<input name="foodGrams" type="number" min="1" placeholder="e.g. 150"></label><label>Meals per day<input name="mealsPerDay" type="number" min="1" max="6" placeholder="e.g. 2"></label></div><label>Health notes<input name="healthNotes" placeholder="Allergies, medication, mobility..."></label><label>Owner name<input name="owner" required placeholder="Owner's full name"></label><label>Owner contact<input name="contact" placeholder="Phone or LINE ID"></label><label>Temperament<select name="temperament"><option>Friendly</option><option>Shy</option><option>Reactive</option><option>Needs solo care</option></select></label><button class="primary-button form-submit" type="submit">Save pet profile</button></form></div>
+  </div>
+  <div class="modal-backdrop" id="workflow-modal">
+    <div class="modal"><button class="modal-close workflow-close" aria-label="Close">&times;</button><span class="eyebrow" id="workflow-eyebrow">New record</span><h2 id="workflow-title">Add booking</h2><p id="workflow-description"></p><form id="workflow-form"></form></div>
+  </div>
+  <div class="modal-backdrop" id="edit-pet-modal">
+    <div class="modal"><button class="modal-close edit-pet-close" aria-label="Close">&times;</button><span class="eyebrow">Pet profile</span><h2>Edit pet details</h2><p>Update care, owner, stay, and health information.</p><form id="edit-pet-form"></form></div>
+  </div>
+  <div class="modal-backdrop" id="delete-pet-modal">
+    <div class="modal confirm-modal"><button class="modal-close delete-pet-close" aria-label="Close">&times;</button><span class="eyebrow">Remove profile</span><h2 id="delete-pet-title">Delete pet?</h2><p>Historical bookings, care logs, and payments will be kept. Type the pet's name to confirm profile deletion.</p><form id="delete-pet-form"><label>Pet name<input id="delete-pet-confirmation" autocomplete="off" required></label><div class="modal-actions"><button class="ghost-button delete-pet-cancel" type="button">Cancel</button><button class="danger-button" type="submit">Delete pet profile</button></div></form></div>
+  </div>
+  <div class="modal-backdrop" id="settings-modal">
+    <div class="modal"><button class="modal-close settings-close" aria-label="Close">&times;</button><span class="eyebrow">Business preferences</span><h2>Settings</h2><p>Changes are saved to the local database and applied throughout the app.</p><form id="settings-form"><div class="form-row"><label>Business name<input name="business_name" required></label><label>Subtitle<input name="business_subtitle" required></label></div><div class="form-row"><label>Manager name<input name="manager_name" required></label><label>Manager role<input name="manager_role" required></label></div><div class="form-row"><label>Daily capacity<input name="capacity" type="number" min="1" max="500" required></label><label>Care update deadline<input name="care_deadline" type="time" required></label></div><button class="primary-button form-submit" type="submit">Save settings</button></form></div>
+  </div>
+  <div class="toast" id="toast"><svg><use href="#i-check"/></svg><span>Update sent successfully</span></div>
+  <script src="app.js"></script>
+</body>
+</html>

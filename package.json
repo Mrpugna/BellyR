@@ -1,0 +1,1 @@
+{"name":"bellyrub-pet-staycation","version":"1.0.0","private":true,"type":"module","scripts":{"dev":"netlify dev","start":"python3 server.py","check":"node --check public/app.js && node --check netlify/functions/api.mjs"},"dependencies":{"@netlify/blobs":"latest"},"devDependencies":{"netlify-cli":"latest"}}
