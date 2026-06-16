@@ -72,11 +72,22 @@ function ownerChannel(contact) {
   return String(contact).toLowerCase().includes('ig:') ? 'Instagram' : 'LINE';
 }
 
-async function api(path, options={}) {
+async function fetchJson(path, options={}) {
   const response = await fetch(path, options);
   const payload = await response.json().catch(() => ({}));
   if (!response.ok) throw new Error(payload.error || 'Request failed');
   return payload;
+}
+
+async function api(path, options={}) {
+  try {
+    return await fetchJson(path, options);
+  } catch (error) {
+    if (path.startsWith('/api/')) {
+      return fetchJson(`/.netlify/functions/api${path.slice(4)}`, options);
+    }
+    throw error;
+  }
 }
 
 async function loadData() {
@@ -117,13 +128,13 @@ function applySettings() {
 }
 
 function renderStats() {
-  const arriving = state.pets.filter(p => p.status === 'Arriving today').length;
+  const checkedIn = state.pets.filter(p => p.status === 'Checked in').length;
   const checkout = state.pets.filter(p => p.status === 'Checking out').length;
-  const inCare = state.pets.filter(p => p.status === 'Checked in').length;
+  const inCare = checkedIn;
   const due = carePetData().filter(p => !p.done).length;
   document.querySelector('#stat-care').textContent = inCare;
-  document.querySelector('#stat-arriving').textContent = arriving;
-  document.querySelector('#stat-arriving-note').textContent = `+${arriving}`;
+  document.querySelector('#stat-arriving').textContent = checkedIn;
+  document.querySelector('#stat-arriving-note').textContent = checkedIn;
   document.querySelector('#stat-checkout').textContent = checkout;
   document.querySelector('#stat-care-due').textContent = due;
   document.querySelector('#care-due-count').textContent = `${due} due`;
@@ -138,18 +149,17 @@ function renderPets(query='', status='all') {
   const filtered = state.pets.filter(p => `${p.name} ${p.breed} ${p.owner}`.toLowerCase().includes(query.toLowerCase()) && (status === 'all' || p.status === status));
   document.querySelector('#pet-list').innerHTML = filtered.length ? filtered.map(p => {
     const temperamentClass = p.temperament.toLowerCase().replaceAll(' ', '-');
-    const statusClass = p.status === 'Arriving today' ? 'arriving' : p.status === 'Checking out' ? 'checkout' : '';
+    const statusClass = p.status === 'Checking out' ? 'checkout' : '';
     return `<div class="pet-row" title="Health: ${escapeHtml(p.health)}. Vaccine: ${escapeHtml(p.vaccine)}. Notes: ${escapeHtml(p.note)}"><div class="pet-identity">${avatar(p)}<div><strong>${escapeHtml(p.name)}</strong><span>${escapeHtml(p.breed)} &middot; ${escapeHtml(p.age)} &middot; ${escapeHtml(p.sex)}</span><small><b>Food:</b> ${escapeHtml(p.foodGrams)}g per meal &middot; ${escapeHtml(p.mealsPerDay)}x daily</small><small><b>Health:</b> ${escapeHtml(p.health)} &middot; ${escapeHtml(p.note)}</small></div></div><div class="stay-cell"><strong>${escapeHtml(p.stay)}</strong><span>${escapeHtml(p.dates)}</span><small>Vaccine: ${escapeHtml(p.vaccine)}</small></div><div class="owner-cell"><div><strong>${escapeHtml(p.owner)}</strong><span>${escapeHtml(p.contact)}</span></div></div><div><span class="temperament ${temperamentClass}">${escapeHtml(p.temperament)}</span></div><div><span class="status-pill ${statusClass}">${escapeHtml(p.status)}</span></div><div class="pet-actions"><button class="row-action edit-pet" data-id="${p.id}" aria-label="Edit ${escapeHtml(p.name)}">Edit</button><button class="row-action delete delete-pet" data-id="${p.id}" aria-label="Delete ${escapeHtml(p.name)}">Delete</button></div></div>`;
   }).join('') : '<div class="empty-state">No pets match that search.</div>';
 }
 
 const serviceTypeOptions = ['Daycare', 'Overnight', 'Daycare + Bath', 'Overnight + Bath'];
-const bookingStatusOptions = ['Pending', 'Confirmed', 'Checked-in', 'Checked-out', 'Cancelled'];
+const bookingStatusOptions = ['Checked-in', 'Checked-out'];
 
 function bookingClass(status) {
-  if (status === 'Pending') return 'pending';
-  if (status === 'Checked-in') return 'checked';
-  return 'confirmed';
+  if (status === 'Checked-out') return 'checkout';
+  return 'checked';
 }
 
 function bookingCoversDate(booking, date) {
@@ -161,6 +171,10 @@ function bookingDateLabel(booking, date) {
   if (booking.check_in === date) return 'Check-in';
   if (booking.check_out === date) return 'Check-out';
   return 'Stay';
+}
+
+function bookingDatesAreValid(booking) {
+  return booking.check_in && booking.check_out && booking.check_out >= booking.check_in;
 }
 
 function renderCalendar() {
@@ -177,18 +191,18 @@ function renderCalendar() {
     const muted = dayNumber < 1 || dayNumber > daysInMonth;
     const displayDay = dayNumber < 1 ? previousDays + dayNumber : dayNumber > daysInMonth ? dayNumber - daysInMonth : dayNumber;
     const cellDate = muted ? '' : `${year}-${String(month + 1).padStart(2,'0')}-${String(dayNumber).padStart(2,'0')}`;
-    const dayBookings = state.bookings.filter(item => cellDate && bookingCoversDate(item, cellDate));
-    cells.push(`<div class="calendar-day ${muted?'muted':''} ${cellDate===TODAY?'today':''}"><span class="date-num">${displayDay}</span>${dayBookings.slice(0,2).map(item => `<button class="booking-chip ${bookingClass(item.status)} edit-booking-chip" data-id="${item.id}" type="button" aria-label="Edit ${escapeHtml(item.pet_name)} booking">${escapeHtml(item.pet_name)} · ${escapeHtml(bookingDateLabel(item, cellDate))}</button>`).join('')}${dayBookings.length>2?`<span class="more-bookings">+${dayBookings.length-2} more</span>`:''}</div>`);
+    const dayBookings = state.bookings.filter(item => cellDate && bookingDatesAreValid(item) && bookingCoversDate(item, cellDate));
+    cells.push(`<div class="calendar-day ${muted?'muted':''} ${cellDate===TODAY?'today':''} ${dayBookings.length?'has-booking':''}"><span class="date-num">${displayDay}</span>${dayBookings.slice(0,2).map(item => `<button class="booking-chip ${bookingClass(item.status)} edit-booking-chip" data-id="${item.id}" type="button" aria-label="Edit ${escapeHtml(item.pet_name)} booking">${escapeHtml(item.pet_name)} · ${escapeHtml(bookingDateLabel(item, cellDate))}</button>`).join('')}${dayBookings.length>2?`<span class="more-bookings">+${dayBookings.length-2} more</span>`:''}</div>`);
   }
   document.querySelector('#calendar-grid').innerHTML = cells.join('');
-  const todayBookings = state.bookings.filter(item => item.check_in === TODAY || item.check_out === TODAY);
-  document.querySelector('#schedule-arrivals').textContent = state.bookings.filter(item => item.check_in === TODAY && item.status !== 'Cancelled').length;
-  document.querySelector('#schedule-departures').textContent = state.bookings.filter(item => item.check_out === TODAY && item.status !== 'Cancelled').length;
+  const todayBookings = state.bookings.filter(item => bookingDatesAreValid(item) && (item.check_in === TODAY || item.check_out === TODAY));
+  document.querySelector('#schedule-arrivals').textContent = state.bookings.filter(item => bookingDatesAreValid(item) && item.check_in === TODAY).length;
+  document.querySelector('#schedule-departures').textContent = state.bookings.filter(item => bookingDatesAreValid(item) && item.check_out === TODAY).length;
   document.querySelector('#schedule-list').innerHTML = todayBookings.length ? todayBookings.map(item => `<div class="schedule-item"><div class="schedule-time">${item.check_in===TODAY?'IN':'OUT'}</div><div><strong>${escapeHtml(item.pet_name)}</strong><p>${escapeHtml(item.service_type)} · ${escapeHtml(item.check_in)} to ${escapeHtml(item.check_out)}</p><span class="status-pill ${bookingClass(item.status)}">${escapeHtml(item.status)}</span><div class="booking-actions"><button class="row-action edit-booking" data-id="${item.id}" type="button">Edit</button><button class="row-action delete delete-booking" data-id="${item.id}" type="button">Delete</button></div></div></div>`).join('') : '<div class="empty-state">No bookings for today.</div>';
 }
 
 function carePetData() {
-  return state.pets.filter(p => ['Checked in','Arriving today','Checking out'].includes(p.status)).map(p => ({
+  return state.pets.filter(p => ['Checked in','Checking out'].includes(p.status)).map(p => ({
     ...p,
     platform: ownerChannel(p.contact),
     done: state.careLogs.some(log => log.pet_name === p.name && careDateInBangkok(log.sent_at) === TODAY),
@@ -294,7 +308,7 @@ function closeModal(modal) { modal.classList.remove('open'); }
 
 function petFormFields(pet) {
   const option=(value,current)=>`<option ${value===current?'selected':''}>${escapeHtml(value)}</option>`;
-  return `<div class="form-row"><label>Pet name<input name="name" required value="${escapeHtml(pet.name)}"></label><label>Breed<input name="breed" required value="${escapeHtml(pet.breed)}"></label></div><div class="form-row"><label>Age<input name="age" value="${escapeHtml(pet.age)}"></label><label>Sex<select name="sex">${option('Female',pet.sex)}${option('Male',pet.sex)}${option('Not set',pet.sex)}</select></label></div><div class="form-row"><label>Food per meal (grams)<input name="food_grams" type="number" min="1" value="${Number(pet.foodGrams)||''}"></label><label>Meals per day<input name="meals_per_day" type="number" min="1" max="6" value="${Number(pet.mealsPerDay)||''}"></label></div><label>Health notes<input name="health_notes" value="${escapeHtml(pet.health)}"></label><label>Vaccine record<input name="vaccine_record" value="${escapeHtml(pet.vaccine)}"></label><div class="form-row"><label>Owner name<input name="owner_name" required value="${escapeHtml(pet.owner)}"></label><label>Owner contact<input name="owner_contact" value="${escapeHtml(pet.contact)}"></label></div><div class="form-row"><label>Temperament<select name="temperament">${['Friendly','Shy','Reactive','Needs solo care'].map(v=>option(v,pet.temperament)).join('')}</select></label><label>Status<select name="status">${['Checked in','Arriving today','Checking out'].map(v=>option(v,pet.status)).join('')}</select></label></div><div class="form-row"><label>Service type<select name="service_type">${serviceTypeOptions.map(v=>option(v,pet.stay)).join('')}</select></label><label>Stay dates<input name="stay_dates" value="${escapeHtml(pet.dates)}"></label></div><label>Additional notes<input name="notes" value="${escapeHtml(pet.note)}"></label><button class="primary-button form-submit" type="submit">Save changes</button>`;
+  return `<div class="form-row"><label>Pet name<input name="name" required value="${escapeHtml(pet.name)}"></label><label>Breed<input name="breed" required value="${escapeHtml(pet.breed)}"></label></div><div class="form-row"><label>Age<input name="age" value="${escapeHtml(pet.age)}"></label><label>Sex<select name="sex">${option('Female',pet.sex)}${option('Male',pet.sex)}${option('Not set',pet.sex)}</select></label></div><div class="form-row"><label>Food per meal (grams)<input name="food_grams" type="number" min="1" value="${Number(pet.foodGrams)||''}"></label><label>Meals per day<input name="meals_per_day" type="number" min="1" max="6" value="${Number(pet.mealsPerDay)||''}"></label></div><label>Health notes<input name="health_notes" value="${escapeHtml(pet.health)}"></label><label>Vaccine record<input name="vaccine_record" value="${escapeHtml(pet.vaccine)}"></label><div class="form-row"><label>Owner name<input name="owner_name" required value="${escapeHtml(pet.owner)}"></label><label>Owner contact<input name="owner_contact" value="${escapeHtml(pet.contact)}"></label></div><div class="form-row"><label>Temperament<select name="temperament">${['Friendly','Shy','Reactive','Needs solo care'].map(v=>option(v,pet.temperament)).join('')}</select></label><label>Status<select name="status">${['Checked in','Checking out'].map(v=>option(v,pet.status)).join('')}</select></label></div><div class="form-row"><label>Service type<select name="service_type">${serviceTypeOptions.map(v=>option(v,pet.stay)).join('')}</select></label><label>Stay dates<input name="stay_dates" value="${escapeHtml(pet.dates)}"></label></div><label>Additional notes<input name="notes" value="${escapeHtml(pet.note)}"></label><button class="primary-button form-submit" type="submit">Save changes</button>`;
 }
 
 function openEditPet(petId) {
@@ -332,7 +346,7 @@ function openEditBooking(bookingId) {
   document.querySelector('#workflow-title').textContent = `Edit ${booking.pet_name} booking`;
   document.querySelector('#workflow-description').textContent = 'Update the check-in date, check-out date, service type, or booking status.';
   form.dataset.type = 'edit-booking';
-  form.innerHTML = `<label>Pet<select name="pet_name" required>${petOptions}</select></label><div class="form-row"><label>Check-in<input type="date" name="check_in" value="${booking.check_in}" required></label><label>Check-out<input type="date" name="check_out" value="${booking.check_out}" required></label></div><label>Service type<select name="service_type">${serviceTypeOptions.map(v=>`<option ${v===booking.service_type?'selected':''}>${v}</option>`).join('')}</select></label><label>Booking status<select name="status">${bookingStatusOptions.map(v=>`<option ${v===booking.status?'selected':''}>${v}</option>`).join('')}</select></label><button class="primary-button form-submit" type="submit">Save booking changes</button>`;
+  form.innerHTML = `<label>Pet<select name="pet_name" required>${petOptions}</select></label><div class="form-row"><label>Check-in<input type="date" name="check_in" value="${booking.check_in}" required></label><label>Check-out<input type="date" name="check_out" value="${booking.check_out}" required></label></div><label>Service type<select name="service_type">${serviceTypeOptions.map(v=>`<option ${v===booking.service_type?'selected':''}>${v}</option>`).join('')}</select></label><label>Booking status<select name="status">${bookingStatusOptions.map(v=>`<option ${v===booking.status?'selected':''}>${v}</option>`).join('')}</select></label><div class="modal-actions booking-edit-actions"><button class="danger-button delete-booking-from-edit" type="button">Delete booking</button><button class="primary-button form-submit" type="submit">Save booking changes</button></div>`;
   workflowModal.classList.add('open');
 }
 
@@ -420,16 +434,14 @@ document.querySelector('#workflow-form').addEventListener('submit', async e => {
   const data=Object.fromEntries(new FormData(e.target));
   try {
     if(e.target.dataset.type==='delete-booking') {
-    const booking=state.bookings.find(item=>item.id===state.deletingBookingId);
-    try {
+      const booking=state.bookings.find(item=>item.id===state.deletingBookingId);
       await api(`/api/bookings/${state.deletingBookingId}`,{method:'DELETE'});
       state.bookings=state.bookings.filter(item=>item.id!==state.deletingBookingId);
       renderCalendar();
       renderStats();
-      closeModal(workflowModal);
       showToast(`${booking?.pet_name || 'Booking'} booking deleted`);
-    } catch(error) { showToast(error.message); }
-  } else if(e.target.dataset.type==='booking' || e.target.dataset.type==='edit-booking') {
+    } else if(e.target.dataset.type==='booking' || e.target.dataset.type==='edit-booking') {
+      if (!bookingDatesAreValid(data)) throw new Error('Check-out date must be the same as or after check-in date');
       const editing=e.target.dataset.type==='edit-booking';
       const saved=await api(editing?`/api/bookings/${state.editingBookingId}`:'/api/bookings',{method:editing?'PUT':'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
       if(editing){const index=state.bookings.findIndex(item=>item.id===state.editingBookingId);state.bookings[index]=saved;}else{state.bookings.push(saved);}
@@ -533,6 +545,7 @@ document.querySelector('#calendar-grid').addEventListener('click',e=>{
 });
 document.querySelector('#workflow-form').addEventListener('click',e=>{
   if(e.target.closest('.workflow-cancel')) closeModal(workflowModal);
+  if(e.target.closest('.delete-booking-from-edit')) openDeleteBooking(state.editingBookingId);
 });
 
 document.querySelector('.month-prev').addEventListener('click',()=>{state.calendarDate.setMonth(state.calendarDate.getMonth()-1);renderCalendar();});

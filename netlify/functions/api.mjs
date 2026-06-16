@@ -14,16 +14,16 @@ const defaultData = {
   },
   pets: [
     { id: 1, name: 'Coco', breed: 'Golden Retriever', age: '4 years', sex: 'Female', food_grams: 180, meals_per_day: 2, health_notes: 'Chicken allergy', vaccine_record: 'Up to date', owner_name: 'Ploy S.', owner_contact: 'LINE: ploy.p', temperament: 'Friendly', status: 'Checked in', service_type: 'Overnight stay', stay_dates: '13-17 Jun', notes: 'Loves people; no chicken treats.', created_at: '2026-06-15T00:00:00.000Z' },
-    { id: 2, name: 'Milo', breed: 'French Bulldog', age: '2 years', sex: 'Male', food_grams: 110, meals_per_day: 2, health_notes: 'Sensitive breathing', vaccine_record: 'Up to date', owner_name: 'Ben T.', owner_contact: '089-445-2210', temperament: 'Friendly', status: 'Arriving today', service_type: 'Daycare', stay_dates: 'Today, 10:30', notes: 'Keep cool during outdoor play.', created_at: '2026-06-15T00:00:00.000Z' },
+    { id: 2, name: 'Milo', breed: 'French Bulldog', age: '2 years', sex: 'Male', food_grams: 110, meals_per_day: 2, health_notes: 'Sensitive breathing', vaccine_record: 'Up to date', owner_name: 'Ben T.', owner_contact: '089-445-2210', temperament: 'Friendly', status: 'Checked in', service_type: 'Daycare', stay_dates: 'Today, 10:30', notes: 'Keep cool during outdoor play.', created_at: '2026-06-15T00:00:00.000Z' },
     { id: 3, name: 'Luna', breed: 'Shiba Inu', age: '3 years', sex: 'Female', food_grams: 130, meals_per_day: 2, health_notes: 'No known conditions', vaccine_record: 'Due 28 Jun', owner_name: 'Mina K.', owner_contact: 'LINE: minak', temperament: 'Shy', status: 'Checked in', service_type: 'Overnight stay', stay_dates: '14-18 Jun', notes: 'Needs a little time to warm up.', created_at: '2026-06-15T00:00:00.000Z' },
     { id: 4, name: 'Bento', breed: 'Beagle', age: '6 years', sex: 'Male', food_grams: 145, meals_per_day: 2, health_notes: 'Daily joint support', vaccine_record: 'Up to date', owner_name: 'Jay P.', owner_contact: 'IG: @jayandbento', temperament: 'Friendly', status: 'Checking out', service_type: 'Overnight stay', stay_dates: '12-15 Jun', notes: 'Tablet with dinner at 6 PM.', created_at: '2026-06-15T00:00:00.000Z' },
     { id: 5, name: 'Mochi', breed: 'Pomeranian', age: '1 year', sex: 'Female', food_grams: 65, meals_per_day: 3, health_notes: 'No known conditions', vaccine_record: 'Up to date', owner_name: 'Fern L.', owner_contact: 'LINE: fern.lee', temperament: 'Reactive', status: 'Checked in', service_type: 'Solo care', stay_dates: '15-16 Jun', notes: 'Solo play only; reactive to large dogs.', created_at: '2026-06-15T00:00:00.000Z' },
-    { id: 6, name: 'Nala', breed: 'Thai Ridgeback', age: '5 years', sex: 'Female', food_grams: 200, meals_per_day: 2, health_notes: 'Hip dysplasia', vaccine_record: 'Up to date', owner_name: 'Chris W.', owner_contact: '081-203-8851', temperament: 'Needs solo care', status: 'Arriving today', service_type: 'Overnight + bath', stay_dates: 'Today, 14:00', notes: 'Short gentle walks only.', created_at: '2026-06-15T00:00:00.000Z' },
+    { id: 6, name: 'Nala', breed: 'Thai Ridgeback', age: '5 years', sex: 'Female', food_grams: 200, meals_per_day: 2, health_notes: 'Hip dysplasia', vaccine_record: 'Up to date', owner_name: 'Chris W.', owner_contact: '081-203-8851', temperament: 'Needs solo care', status: 'Checked in', service_type: 'Overnight + bath', stay_dates: 'Today, 14:00', notes: 'Short gentle walks only.', created_at: '2026-06-15T00:00:00.000Z' },
   ],
   bookings: [
     { id: 1, pet_name: 'Coco', check_in: '2026-06-13', check_out: '2026-06-17', service_type: 'Overnight', status: 'Checked-in' },
-    { id: 2, pet_name: 'Milo', check_in: TODAY, check_out: TODAY, service_type: 'Daycare', status: 'Confirmed' },
-    { id: 3, pet_name: 'Nala', check_in: TODAY, check_out: '2026-06-18', service_type: 'Overnight + bath', status: 'Confirmed' },
+    { id: 2, pet_name: 'Milo', check_in: TODAY, check_out: TODAY, service_type: 'Daycare', status: 'Checked-in' },
+    { id: 3, pet_name: 'Nala', check_in: TODAY, check_out: '2026-06-18', service_type: 'Overnight + bath', status: 'Checked-in' },
   ],
   careLogs: [],
   payments: [
@@ -98,7 +98,7 @@ export default async (req) => {
     const body = await readBody(req);
     const missing = missingFields(body, ['name', 'breed', 'owner_name']);
     if (missing.length) return json({ error: 'Missing required fields', fields: missing }, 422);
-    const pet = { id: nextId(data, 'pets'), name: body.name, breed: body.breed, age: body.age || '', sex: body.sex || '', food_grams: body.food_grams ?? null, meals_per_day: body.meals_per_day ?? null, health_notes: body.health_notes || '', vaccine_record: body.vaccine_record || 'Record pending', owner_name: body.owner_name, owner_contact: body.owner_contact || '', temperament: body.temperament || 'Friendly', status: body.status || 'Arriving today', service_type: body.service_type || 'Booking pending', stay_dates: body.stay_dates || 'Dates not set', notes: body.notes || '', created_at: new Date().toISOString() };
+    const pet = { id: nextId(data, 'pets'), name: body.name, breed: body.breed, age: body.age || '', sex: body.sex || '', food_grams: body.food_grams ?? null, meals_per_day: body.meals_per_day ?? null, health_notes: body.health_notes || '', vaccine_record: body.vaccine_record || 'Record pending', owner_name: body.owner_name, owner_contact: body.owner_contact || '', temperament: body.temperament || 'Friendly', status: body.status || 'Checked in', service_type: body.service_type || 'Booking pending', stay_dates: body.stay_dates || 'Dates not set', notes: body.notes || '', created_at: new Date().toISOString() };
     data.pets.push(pet); await saveData(data); return json(pet, 201);
   }
 
@@ -111,7 +111,7 @@ export default async (req) => {
     const index = data.pets.findIndex((pet) => pet.id === id);
     if (index === -1) return json({ error: 'Pet not found' }, 404);
     const oldName = data.pets[index].name;
-    const updated = { ...data.pets[index], name: body.name, breed: body.breed, age: body.age || '', sex: body.sex || '', food_grams: body.food_grams ?? null, meals_per_day: body.meals_per_day ?? null, health_notes: body.health_notes || '', vaccine_record: body.vaccine_record || 'Record pending', owner_name: body.owner_name, owner_contact: body.owner_contact || '', temperament: body.temperament || 'Friendly', status: body.status || 'Arriving today', service_type: body.service_type || 'Booking pending', stay_dates: body.stay_dates || 'Dates not set', notes: body.notes || '' };
+    const updated = { ...data.pets[index], name: body.name, breed: body.breed, age: body.age || '', sex: body.sex || '', food_grams: body.food_grams ?? null, meals_per_day: body.meals_per_day ?? null, health_notes: body.health_notes || '', vaccine_record: body.vaccine_record || 'Record pending', owner_name: body.owner_name, owner_contact: body.owner_contact || '', temperament: body.temperament || 'Friendly', status: body.status || 'Checked in', service_type: body.service_type || 'Booking pending', stay_dates: body.stay_dates || 'Dates not set', notes: body.notes || '' };
     data.pets[index] = updated;
     if (oldName !== updated.name) {
       data.bookings.forEach((item) => { if (item.pet_name === oldName) item.pet_name = updated.name; });

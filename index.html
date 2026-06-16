@@ -55,13 +55,13 @@
 
       <section class="page active" id="dashboard-page">
         <div class="stats-grid">
-          <article class="stat-card peach"><div class="stat-icon"><svg><use href="#i-heart"/></svg></div><div><span>Pets in our care</span><strong id="stat-care">0</strong><small><b id="stat-arriving-note">0</b> arriving today</small></div></article>
-          <article class="stat-card mint"><div class="stat-icon"><svg><use href="#i-clock"/></svg></div><div><span>Checking in today</span><strong id="stat-arriving">0</strong><small>Confirmed arrivals</small></div></article>
+          <article class="stat-card peach"><div class="stat-icon"><svg><use href="#i-heart"/></svg></div><div><span>Pets in our care</span><strong id="stat-care">0</strong><small><b id="stat-arriving-note">0</b> checked in</small></div></article>
+          <article class="stat-card mint"><div class="stat-icon"><svg><use href="#i-clock"/></svg></div><div><span>Checked in today</span><strong id="stat-arriving">0</strong><small>Currently checked in</small></div></article>
           <article class="stat-card lavender"><div class="stat-icon"><svg><use href="#i-calendar"/></svg></div><div><span>Checking out today</span><strong id="stat-checkout">0</strong><small>Ready for pickup</small></div></article>
           <article class="stat-card yellow"><div class="stat-icon"><svg><use href="#i-message"/></svg></div><div><span>Care updates due</span><strong id="stat-care-due">0</strong><small><b>Send before 5 PM</b></small></div></article>
         </div>
 
-        <div class="section-heading"><div><h2>Pets staying with us</h2><p>A quick look at every guest and what they need today.</p></div><div class="view-controls"><label class="mini-search"><svg><use href="#i-search"/></svg><input id="pet-search" type="search" placeholder="Search pets"></label><select id="pet-filter"><option value="all">All statuses</option><option value="Checked in">Checked in</option><option value="Arriving today">Arriving today</option><option value="Checking out">Checking out</option></select></div></div>
+        <div class="section-heading"><div><h2>Pets staying with us</h2><p>A quick look at every guest and what they need today.</p></div><div class="view-controls"><label class="mini-search"><svg><use href="#i-search"/></svg><input id="pet-search" type="search" placeholder="Search pets"></label><select id="pet-filter"><option value="all">All statuses</option><option value="Checked in">Checked in</option><option value="Checking out">Checking out</option></select></div></div>
 
         <div class="pet-table-card">
           <div class="table-head"><span>Pet</span><span>Stay details</span><span>Owner</span><span>Temperament</span><span>Status</span><span>Actions</span></div>
@@ -70,7 +70,7 @@
       </section>
 
       <section class="page" id="calendar-page">
-        <div class="calendar-toolbar"><div class="month-nav"><button class="icon-button month-prev" aria-label="Previous month">&#8249;</button><h2 id="calendar-month">June 2026</h2><button class="icon-button month-next" aria-label="Next month">&#8250;</button><button class="ghost-button" id="calendar-today">Today</button></div><div class="booking-legend"><span><i class="dot confirmed"></i>Confirmed</span><span><i class="dot pending"></i>Pending</span><span><i class="dot checked"></i>Checked in</span></div></div>
+        <div class="calendar-toolbar"><div class="month-nav"><button class="icon-button month-prev" aria-label="Previous month">&#8249;</button><h2 id="calendar-month">June 2026</h2><button class="icon-button month-next" aria-label="Next month">&#8250;</button><button class="ghost-button" id="calendar-today">Today</button></div><div class="booking-legend"><span><i class="dot confirmed"></i>Checked-in</span><span><i class="dot checked"></i>Checked-out</span></div></div>
         <div class="calendar-layout">
           <article class="calendar-card"><div class="weekdays"><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span></div><div class="calendar-grid" id="calendar-grid"></div></article>
           <aside class="day-panel"><span class="eyebrow">Monday, 15 June</span><h2>Today's schedule</h2><div class="schedule-summary"><div><strong id="schedule-arrivals">0</strong><span>Arrivals</span></div><div><strong id="schedule-departures">0</strong><span>Departures</span></div></div><div id="schedule-list"></div></aside>

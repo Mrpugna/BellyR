@@ -14,11 +14,11 @@ DB_PATH = ROOT / "bellyrub.db"
 
 SEED_PETS = [
     ("Coco", "Golden Retriever", "4 years", "Female", 180, 2, "Chicken allergy", "Up to date", "Ploy S.", "LINE: ploy.p", "Friendly", "Checked in", "Overnight stay", "13-17 Jun", "Loves people; no chicken treats."),
-    ("Milo", "French Bulldog", "2 years", "Male", 110, 2, "Sensitive breathing", "Up to date", "Ben T.", "089-445-2210", "Friendly", "Arriving today", "Daycare", "Today, 10:30", "Keep cool during outdoor play."),
+    ("Milo", "French Bulldog", "2 years", "Male", 110, 2, "Sensitive breathing", "Up to date", "Ben T.", "089-445-2210", "Friendly", "Checked in", "Daycare", "Today, 10:30", "Keep cool during outdoor play."),
     ("Luna", "Shiba Inu", "3 years", "Female", 130, 2, "No known conditions", "Due 28 Jun", "Mina K.", "LINE: minak", "Shy", "Checked in", "Overnight stay", "14-18 Jun", "Needs a little time to warm up."),
     ("Bento", "Beagle", "6 years", "Male", 145, 2, "Daily joint support", "Up to date", "Jay P.", "IG: @jayandbento", "Friendly", "Checking out", "Overnight stay", "12-15 Jun", "Tablet with dinner at 6 PM."),
     ("Mochi", "Pomeranian", "1 year", "Female", 65, 3, "No known conditions", "Up to date", "Fern L.", "LINE: fern.lee", "Reactive", "Checked in", "Solo care", "15-16 Jun", "Solo play only; reactive to large dogs."),
-    ("Nala", "Thai Ridgeback", "5 years", "Female", 200, 2, "Hip dysplasia", "Up to date", "Chris W.", "081-203-8851", "Needs solo care", "Arriving today", "Overnight + bath", "Today, 14:00", "Short gentle walks only."),
+    ("Nala", "Thai Ridgeback", "5 years", "Female", 200, 2, "Hip dysplasia", "Up to date", "Chris W.", "081-203-8851", "Needs solo care", "Checked in", "Overnight + bath", "Today, 14:00", "Short gentle walks only."),
 ]
 
 
@@ -45,7 +45,7 @@ def initialize_database():
                 owner_name TEXT NOT NULL,
                 owner_contact TEXT NOT NULL DEFAULT '',
                 temperament TEXT NOT NULL DEFAULT 'Friendly',
-                status TEXT NOT NULL DEFAULT 'Arriving today',
+                status TEXT NOT NULL DEFAULT 'Checked in',
                 service_type TEXT NOT NULL DEFAULT 'Booking pending',
                 stay_dates TEXT NOT NULL DEFAULT 'Dates not set',
                 notes TEXT NOT NULL DEFAULT '',
@@ -103,8 +103,8 @@ def initialize_database():
                 "INSERT INTO bookings (pet_name, check_in, check_out, service_type, status) VALUES (?, ?, ?, ?, ?)",
                 [
                     ("Coco", "2026-06-13", "2026-06-17", "Overnight", "Checked-in"),
-                    ("Milo", "2026-06-15", "2026-06-15", "Daycare", "Confirmed"),
-                    ("Nala", "2026-06-15", "2026-06-18", "Overnight + bath", "Confirmed"),
+                    ("Milo", "2026-06-15", "2026-06-15", "Daycare", "Checked-in"),
+                    ("Nala", "2026-06-15", "2026-06-18", "Overnight + bath", "Checked-in"),
                 ],
             )
         if db.execute("SELECT COUNT(*) FROM payments").fetchone()[0] == 0:
@@ -199,7 +199,7 @@ class BellyRubHandler(SimpleHTTPRequestHandler):
                         data.get("food_grams"), data.get("meals_per_day"), data.get("health_notes", ""),
                         data.get("vaccine_record", "Record pending"), data["owner_name"],
                         data.get("owner_contact", ""), data.get("temperament", "Friendly"),
-                        data.get("status", "Arriving today"), data.get("service_type", "Booking pending"),
+                        data.get("status", "Checked in"), data.get("service_type", "Booking pending"),
                         data.get("stay_dates", "Dates not set"), data.get("notes", ""), now_iso(),
                     ),
                 )
@@ -277,7 +277,7 @@ class BellyRubHandler(SimpleHTTPRequestHandler):
                      data.get("food_grams"), data.get("meals_per_day"), data.get("health_notes", ""),
                      data.get("vaccine_record", "Record pending"), data["owner_name"],
                      data.get("owner_contact", ""), data.get("temperament", "Friendly"),
-                     data.get("status", "Arriving today"), data.get("service_type", "Booking pending"),
+                     data.get("status", "Checked in"), data.get("service_type", "Booking pending"),
                      data.get("stay_dates", "Dates not set"), data.get("notes", ""), pet_id),
                 )
                 if existing["name"] != data["name"]:

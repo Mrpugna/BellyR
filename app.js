@@ -72,11 +72,22 @@ function ownerChannel(contact) {
   return String(contact).toLowerCase().includes('ig:') ? 'Instagram' : 'LINE';
 }
 
-async function api(path, options={}) {
+async function fetchJson(path, options={}) {
   const response = await fetch(path, options);
   const payload = await response.json().catch(() => ({}));
   if (!response.ok) throw new Error(payload.error || 'Request failed');
   return payload;
+}
+
+async function api(path, options={}) {
+  try {
+    return await fetchJson(path, options);
+  } catch (error) {
+    if (path.startsWith('/api/')) {
+      return fetchJson(`/.netlify/functions/api${path.slice(4)}`, options);
+    }
+    throw error;
+  }
 }
 
 async function loadData() {
